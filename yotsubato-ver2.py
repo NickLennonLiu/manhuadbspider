@@ -33,25 +33,25 @@ def download(pageurl, path):
     html = None
     while(html == None): html = gethtml(pageurl)
     html = html.text
-    jpgurl = \
-        re.findall(
-            r'<img class="img-fluid show-pic" src="(.*?)" />', html)[0]
-    print(jpgurl)
+    jpgurl = re.findall(r'<img class="img-fluid show-pic" src="(.*?)" />', html)[0]
+    print('Downloading',jpgurl)
     if not os.path.exists(path[0]):
         os.mkdir(path[0])
     path = '%s/%s' % (path[0], str(path[1])+'.jpg')
-    urllib.request.urlretrieve(jpgurl, path)
-    #with open(path,"wb") as f:
-    #    f.write(urllib.request.urlopen(jpgurl).read())
-    #f.close()
-
+    if not os.path.exists(path):
+        urllib.request.urlretrieve(jpgurl, path)
+    else:
+        print('file already exists!')
 
 def main():
+    url = input('请输入你要批量下载漫画的网址：')
+    root = input('请输入下载目录（默认当前目录）：')
+    if(root): os.chdir(root)
 
     socks.set_default_proxy(socks.SOCKS5, "localhost", 7891)
     socket.socket = socks.socksocket
 
-    url = 'http://www.manhuadb.com/manhua/1051'
+    #url = 'http://www.manhuadb.com/manhua/1051'
     html = None
     while(html == None): html = gethtml(url)
     html = html.text
@@ -82,7 +82,7 @@ def main():
         for [page,path] in zip(list_page_urls,list_path):
             t = threading.Thread(target=download,args=(page,path))
             threads.append(t)
-            time.sleep(1)
+            time.sleep(0.3)
             threads[i].start()
             i = i + 1
         threads[-1].join()
