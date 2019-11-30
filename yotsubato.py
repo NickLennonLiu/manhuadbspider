@@ -6,6 +6,10 @@ from bs4 import BeautifulSoup
 import urllib
 import urllib3
 import threading
+import socket
+import socks
+import concurrent
+from concurrent.futures import ThreadPoolExecutor
 
 def gethtml(url):
     try:
@@ -28,12 +32,17 @@ def download(jpgurl, path):
     if not os.path.exists(path[0]):
         os.mkdir(path[0])
     path = '%s/%s' % (path[0], str(path[1])+'.jpg')
-    with open(path,"wb") as f:
-        f.write(urllib.request.urlopen(jpgurl).read())
-    f.close()
+    urllib.request.urlretrieve(jpgurl,path)
+    #with open(path,"wb") as f:
+    #    f.write(urllib.request.urlopen(jpgurl).read())
+    #f.close()
 
 
 def main():
+
+    socks.set_default_proxy(socks.SOCKS5, "localhost", 7891)
+    socket.socket = socks.socksocket
+
     url = 'http://www.manhuadb.com/manhua/1051'
     html = gethtml(url).text
     urlslist = re.findall(' <a class="" href="(.*?)" title=".*">\d+</a>', html)
